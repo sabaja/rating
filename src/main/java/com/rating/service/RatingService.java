@@ -4,7 +4,7 @@ import com.rating.event.RatingEvent;
 
 public interface RatingService {
 
-    RatingEvent save(RatingEvent ratingEvent);
+    RatingEvent saveOrUpdateRating(RatingEvent ratingEvent);
 
     RatingEvent get(Long id);
 }
