@@ -27,21 +27,21 @@ public class RatingServiceImpl implements RatingService {
     public RatingEvent save(RatingEvent ratingEvent) {
         if (Objects.nonNull(ratingEvent)) {
             final Long courseId = ratingEvent.getCourseId();
-            if (Objects.nonNull(courseId)) {
-                Optional.ofNullable(ratingRepository.findById(courseId))
-                        .map(this::updateRating)
-                        .orElseGet();
+            if (Objects.nonNull(courseId) && courseId.compareTo(0L) > 0)) {
+                return Optional.ofNullable(ratingRepository.findById(courseId))
+                        .map((entity) -> this.updateRating(entity, ratingEvent)
+                        .map(     ratingRepository::save)
+                             .map(mapper::ratingToRatingEvent)
+                        .orElseGet( () -> {
+                             return saveRatingEvent(ratingEvent);         
+                        });
             }
         }
         return null;
     }
 
-    private RatingEvent updateRating(Optional<Rating> rating) {
-        return rating.map(value -> {
-            final RatingEvent ratingEvent = mapper.ratingToRatingEvent(value);
-            ratingRepository.u
-        }).orElse(null);
-
+    private RatingEvent updateRating(Rating rating, RatingEvent ratingEvent) {
+        rating.setRatingValue(ratingEvent.getRatingStars());
     }
 
     /**
@@ -52,4 +52,9 @@ public class RatingServiceImpl implements RatingService {
     public RatingEvent get(Long id) {
         return null;
     }
+                             
+    private RatingEvent  saveRatingEvent(RatingEvent ratingEvent) {
+        final Rating rating = mapper.ratingEventToRating(ratingEvent);
+        return mapper.ratingToRatingEvent(ratingRepository.save(rating));
+    }                             
 }
