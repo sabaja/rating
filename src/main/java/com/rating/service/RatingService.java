@@ -1,10 +1,10 @@
 package com.rating.service;
 
-import com.rating.event.RatingEvent;
+import com.rating.event.RatingEventMessage;
 
 public interface RatingService {
 
-    RatingEvent saveOrUpdateRating(RatingEvent ratingEvent);
+    RatingEventMessage saveOrUpdateRating(RatingEventMessage ratingEventMessage);
 
-    RatingEvent get(Long id);
+    RatingEventMessage get(Long id);
 }
