@@ -12,7 +12,7 @@ public class RatingEventConsumer {
 
     @RabbitListener(queues = "rating_request_queue", concurrency = "10")
     public RatingEventMessage receive(RatingDto ratingDto) {
-        log.info("server receive a request of Rating information: {}", ratingDto);
+        log.info("Server received a request of Rating information: {}", ratingDto);
         RatingEventMessage response = new RatingEventMessage();
         response.setCourseId(ratingDto.getCourseId());
         response.setRatingValue(5.00D);
