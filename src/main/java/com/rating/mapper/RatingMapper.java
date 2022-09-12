@@ -1,13 +1,16 @@
 package com.rating.mapper;
 
 import com.rating.enitities.Rating;
-import com.rating.event.RatingEventMessage;
+import com.rating.model.RatingDto;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface RatingMapper {
 
-    Rating ratingEventToRating(final RatingEventMessage ratingEventMessage);
+    @Mapping(source = "ratingValue", target = "ratingStars")
+    Rating ratingDtoToRating(final RatingDto ratingDto);
 
-    RatingEventMessage ratingToRatingEvent(final Rating rating);
+    @Mapping(source = "ratingStars", target = "ratingValue")
+    RatingDto ratingToRatingDto(final Rating rating);
 }
