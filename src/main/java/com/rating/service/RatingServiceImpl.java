@@ -1,12 +1,14 @@
 package com.rating.service;
 
 import com.rating.enitities.Rating;
-import com.rating.event.RatingEventMessage;
 import com.rating.mapper.RatingMapper;
+import com.rating.model.RatingDto;
 import com.rating.repositories.RatingRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
+@Service
 public class RatingServiceImpl implements RatingService {
 
     private final RatingRepository ratingRepository;
@@ -19,40 +21,36 @@ public class RatingServiceImpl implements RatingService {
     }
 
     /**
-     * @param ratingEventMessage
+     * @param ratingDto
      * @return
      */
     @Override
-    public RatingEventMessage saveOrUpdateRating(RatingEventMessage ratingEventMessage) {
-        if (Objects.nonNull(ratingEventMessage)) {
-            final Long courseId = ratingEventMessage.getCourseId();
+    public RatingDto saveOrUpdateRating(RatingDto ratingDto) {
+        if (Objects.nonNull(ratingDto)) {
+            final Long courseId = ratingDto.getCourseId();
             if (Objects.nonNull(courseId) && courseId.compareTo(0L) > 0) {
                 return ratingRepository.findById(courseId)
-                        .map(entity -> this.updateRating(entity, ratingEventMessage))
+                        .map(entity -> this.updateRating(entity, ratingDto))
                         .map(ratingRepository::save)
-                        .map(mapper::ratingToRatingEvent)
-                        .orElseGet(() -> saveRatingEvent(ratingEventMessage));
+                        .map(mapper::ratingToRatingDto)
+                        .orElseGet(() -> saveRating(ratingDto));
             }
         }
         return null;
     }
 
-    private Rating updateRating(Rating rating, RatingEventMessage ratingEventMessage) {
-        rating.setRatingStars(ratingEventMessage.getRatingValue());
-        return rating;
-    }
-
-    /**
-     * @param id
-     * @return
-     */
     @Override
-    public RatingEventMessage get(Long id) {
+    public RatingDto get(Long id) {
         return null;
     }
 
-    private RatingEventMessage saveRatingEvent(RatingEventMessage ratingEventMessage) {
-        final Rating rating = mapper.ratingEventToRating(ratingEventMessage);
-        return mapper.ratingToRatingEvent(ratingRepository.save(rating));
+    private Rating updateRating(Rating rating, RatingDto ratingDto) {
+        rating.setRatingStars(ratingDto.getRatingValue());
+        return rating;
+    }
+
+    private RatingDto saveRating(RatingDto ratingDto) {
+        final Rating rating = mapper.ratingDtoToRating(ratingDto);
+        return mapper.ratingToRatingDto(ratingRepository.save(rating));
     }
 }
