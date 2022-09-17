@@ -18,7 +18,7 @@ public class RatingEventConsumer {
     @Autowired
     private RatingRepository ratingRepository;
 
-    @RabbitListener(queues = "rating_request_queue", concurrency = "10")
+    @RabbitListener(queues = "rating_status_request_queue", concurrency = "10")
     public RatingEventMessage receive(RatingDto ratingDto) {
         log.info("Server received a request of Rating information: {}", ratingDto);
         return createRatingEventMessage(ratingDto);

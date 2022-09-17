@@ -13,28 +13,30 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfiguration {
 
-    @Value("${rating.exchange}")
+    /* https://stackoverflow.com/questions/53706538/spring-amqp-rabbitmq-rpc-priority-queue */
+
+    @Value("${rating.status.exchange}")
     private String ratingExchange ;
 
     @Value("${rating.status.queue}")
     private String ratingStatusQueue;
 
-    @Value("${rating.routing.key}")
+    @Value("${rating.status.routing.key}")
     private String routingKey;
 
     @Bean
-    Queue queue() {
+    Queue queueStatus() {
         return new Queue(ratingStatusQueue);
     }
 
-    @Bean
-    DirectExchange exchange() {
+    @Bean(name = "ratingStatusExchange")
+    DirectExchange exchangeRatingStatus() {
         return new DirectExchange(ratingExchange);
     }
 
     @Bean
-    Binding binding(Queue queue, DirectExchange directExchange) {
-        return BindingBuilder.bind(queue).to(directExchange).with(routingKey);
+    Binding bindingRatingStatus() {
+        return BindingBuilder.bind(queueStatus()).to(exchangeRatingStatus()).with(routingKey);
     }
 
     @Bean
