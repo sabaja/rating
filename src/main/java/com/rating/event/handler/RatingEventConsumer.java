@@ -19,11 +19,20 @@ public class RatingEventConsumer {
     private RatingRepository ratingRepository;
 
     @RabbitListener(queues = "rating_status_request_queue", concurrency = "10")
-    public RatingEventMessage receive(RatingDto ratingDto) {
+    public RatingEventMessage receiveStatusRatingInformation(RatingDto ratingDto) {
         log.info("Server received a request of Rating information: {}", ratingDto);
         return createRatingEventMessage(ratingDto);
     }
 
+
+    @RabbitListener(queues = "rating_update_request_queue", concurrency = "10")
+    public RatingEventMessage receiveUptadeRatingInformation(RatingDto ratingDto) {
+        log.info("Server received a request of updating Rating information: {}", ratingDto);
+        RatingEventMessage message = new RatingEventMessage();
+        message.setRatingValue(ratingDto.getRatingValue());
+        message.setCourseId(ratingDto.getCourseId());
+        return message;
+    }
     private RatingEventMessage createRatingEventMessage(RatingDto ratingDto) {
         final Long courseId = ratingDto.getCourseId();
         if (Objects.nonNull(courseId)) {

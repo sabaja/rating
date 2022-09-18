@@ -16,13 +16,18 @@ public class RabbitMQConfiguration {
     /* https://stackoverflow.com/questions/53706538/spring-amqp-rabbitmq-rpc-priority-queue */
 
     @Value("${rating.status.exchange}")
-    private String ratingExchange ;
+    private String ratingStatusExchange;
 
+    @Value("${rating.update.exchange}")
+    private String ratingUpdateExchange ;
     @Value("${rating.status.queue}")
     private String ratingStatusQueue;
 
     @Value("${rating.status.routing.key}")
-    private String routingKey;
+    private String routingStatusKey;
+
+    @Value("${rating.update.routing.key}")
+    private String routingUpdateKey;
 
     @Bean
     Queue queueStatus() {
@@ -31,12 +36,22 @@ public class RabbitMQConfiguration {
 
     @Bean(name = "ratingStatusExchange")
     DirectExchange exchangeRatingStatus() {
-        return new DirectExchange(ratingExchange);
+        return new DirectExchange(ratingStatusExchange);
+    }
+
+    @Bean(name = "ratingUpdateExchange")
+    DirectExchange exchangeRatingUpdate() {
+        return new DirectExchange(ratingUpdateExchange);
     }
 
     @Bean
     Binding bindingRatingStatus() {
-        return BindingBuilder.bind(queueStatus()).to(exchangeRatingStatus()).with(routingKey);
+        return BindingBuilder.bind(queueStatus()).to(exchangeRatingStatus()).with(routingStatusKey);
+    }
+
+    @Bean
+    Binding bindingRatingUpdate() {
+        return BindingBuilder.bind(queueStatus()).to(exchangeRatingUpdate()).with(routingUpdateKey);
     }
 
     @Bean
