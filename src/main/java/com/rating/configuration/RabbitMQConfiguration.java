@@ -23,6 +23,9 @@ public class RabbitMQConfiguration {
     @Value("${rating.status.queue}")
     private String ratingStatusQueue;
 
+    @Value("${rating.update.queue}")
+    private String ratingUpdateQueue;
+
     @Value("${rating.status.routing.key}")
     private String routingStatusKey;
 
@@ -32,6 +35,10 @@ public class RabbitMQConfiguration {
     @Bean
     Queue queueStatus() {
         return new Queue(ratingStatusQueue);
+    }
+    @Bean
+    Queue queueUpdate() {
+        return new Queue(ratingUpdateQueue);
     }
 
     @Bean(name = "ratingStatusExchange")
@@ -58,4 +65,18 @@ public class RabbitMQConfiguration {
     public MessageConverter jackson2MessageConverter() {
         return new Jackson2JsonMessageConverter();
     }
+//
+//    @Bean(name = "ratingStatusListener")
+//    public SimpleMessageListenerContainer ratingStatusListener(ConnectionFactory connectionFactory) {
+//        SimpleMessageListenerContainer listenerContainer = new SimpleMessageListenerContainer(connectionFactory);
+//        listenerContainer.setQueues(queueStatus());
+//        return listenerContainer;
+//    }
+//    @Bean(name = "ratingStatusListener")
+//    public SimpleMessageListenerContainer ratingUpdateListener(ConnectionFactory connectionFactory) {
+//        SimpleMessageListenerContainer listenerContainer = new SimpleMessageListenerContainer(connectionFactory);
+//        listenerContainer.setQueues(queueUpdate());
+//        return listenerContainer;
+//    }
+
 }
