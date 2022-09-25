@@ -13,13 +13,16 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfiguration {
 
-    /* https://stackoverflow.com/questions/53706538/spring-amqp-rabbitmq-rpc-priority-queue */
+    /*
+      https://stackoverflow.com/questions/53706538/spring-amqp-rabbitmq-rpc-priority-queue
+      https://www.javainuse.com/messaging/rabbitmq/exchange
+    */
 
     @Value("${rating.status.exchange}")
     private String ratingStatusExchange;
 
     @Value("${rating.update.exchange}")
-    private String ratingUpdateExchange ;
+    private String ratingUpdateExchange;
     @Value("${rating.status.queue}")
     private String ratingStatusQueue;
 
@@ -36,6 +39,7 @@ public class RabbitMQConfiguration {
     Queue queueStatus() {
         return new Queue(ratingStatusQueue);
     }
+
     @Bean
     Queue queueUpdate() {
         return new Queue(ratingUpdateQueue);
