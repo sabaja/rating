@@ -18,7 +18,7 @@ public class RatingEventConsumer {
     @Autowired
     private RatingRepository ratingRepository;
 
-    @RabbitListener(queues = "rating_status_request_queue", concurrency = "10")
+    @RabbitListener(queues = "rating_status_queue", concurrency = "10")
     public RatingEventMessage receiveStatusRatingInformation(RatingDto ratingDto) {
         log.info("Server received a request of Rating information: {}", ratingDto);
         final Long courseId = ratingDto.getCourseId();
@@ -34,7 +34,7 @@ public class RatingEventConsumer {
     }
 
 
-    @RabbitListener(queues = "rating_update_request_queue", concurrency = "10")
+    @RabbitListener(queues = "rating_update_queue", concurrency = "10")
     public RatingEventMessage receiveUptadeRatingInformation(RatingDto ratingDto) {
         log.info("Server received a request of updating Rating information: {}", ratingDto);
         final Long courseId = ratingDto.getCourseId();
