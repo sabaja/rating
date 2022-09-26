@@ -18,22 +18,43 @@ public class RatingEventConsumer {
     @Autowired
     private RatingRepository ratingRepository;
 
-    @RabbitListener(queues = "rating_request_queue", concurrency = "10")
-    public RatingEventMessage receive(RatingDto ratingDto) {
+    @RabbitListener(queues = "rating_status_queue", concurrency = "10")
+    public RatingEventMessage receiveStatusRatingInformation(RatingDto ratingDto) {
         log.info("Server received a request of Rating information: {}", ratingDto);
-        return createRatingEventMessage(ratingDto);
-    }
-
-    private RatingEventMessage createRatingEventMessage(RatingDto ratingDto) {
         final Long courseId = ratingDto.getCourseId();
         if (Objects.nonNull(courseId)) {
             final Rating rating = ratingRepository.findByCourseId(courseId);
-            RatingEventMessage response = new RatingEventMessage();
-            response.setCourseId(courseId);
-            response.setRatingValue(rating.getRatingStars());
-            return response;
+            if (Objects.nonNull(rating)) {
+                return createRatingEventMessage(rating);
+            }
+            log.error("No Rating found with id {}", courseId);
         }
+        log.error("No Rating found ...");
         return createDefaultRatingEventMessage();
+    }
+
+
+    @RabbitListener(queues = "rating_update_queue", concurrency = "10")
+    public RatingEventMessage receiveUptadeRatingInformation(RatingDto ratingDto) {
+        log.info("Server received a request of updating Rating information: {}", ratingDto);
+        final Long courseId = ratingDto.getCourseId();
+        if (Objects.nonNull(courseId)) {
+            Rating rating = ratingRepository.findByCourseId(courseId);
+            if (Objects.nonNull(rating)) {
+                rating.setRatingStars(ratingDto.getRatingValue());
+                return createRatingEventMessage(ratingRepository.save(rating));
+            }
+            log.error("No Rating found with id {}", courseId);
+        }
+        log.error("No Rating found ...");
+        return createDefaultRatingEventMessage();
+    }
+
+    private RatingEventMessage createRatingEventMessage(Rating rating) {
+        RatingEventMessage message = new RatingEventMessage();
+        message.setRatingValue(rating.getRatingStars());
+        message.setCourseId(rating.getCourseId());
+        return message;
     }
 
     private RatingEventMessage createDefaultRatingEventMessage() {

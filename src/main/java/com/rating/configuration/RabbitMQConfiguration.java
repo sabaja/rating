@@ -13,32 +13,74 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfiguration {
 
-    @Value("${rating.exchange}")
-    private String ratingExchange ;
+    /*
+      https://stackoverflow.com/questions/53706538/spring-amqp-rabbitmq-rpc-priority-queue
+      https://www.javainuse.com/messaging/rabbitmq/exchange
+    */
 
+    @Value("${rating.status.exchange}")
+    private String ratingStatusExchange;
+
+    @Value("${rating.update.exchange}")
+    private String ratingUpdateExchange;
     @Value("${rating.status.queue}")
     private String ratingStatusQueue;
 
-    @Value("${rating.routing.key}")
-    private String routingKey;
+    @Value("${rating.update.queue}")
+    private String ratingUpdateQueue;
+
+    @Value("${rating.status.routing.key}")
+    private String routingStatusKey;
+
+    @Value("${rating.update.routing.key}")
+    private String routingUpdateKey;
 
     @Bean
-    Queue queue() {
+    Queue queueStatus() {
         return new Queue(ratingStatusQueue);
     }
 
     @Bean
-    DirectExchange exchange() {
-        return new DirectExchange(ratingExchange);
+    Queue queueUpdate() {
+        return new Queue(ratingUpdateQueue);
+    }
+
+    @Bean(name = "ratingStatusExchange")
+    DirectExchange exchangeRatingStatus() {
+        return new DirectExchange(ratingStatusExchange);
+    }
+
+    @Bean(name = "ratingUpdateExchange")
+    DirectExchange exchangeRatingUpdate() {
+        return new DirectExchange(ratingUpdateExchange);
     }
 
     @Bean
-    Binding binding(Queue queue, DirectExchange directExchange) {
-        return BindingBuilder.bind(queue).to(directExchange).with(routingKey);
+    Binding bindingRatingStatus() {
+        return BindingBuilder.bind(queueStatus()).to(exchangeRatingStatus()).with(routingStatusKey);
+    }
+
+    @Bean
+    Binding bindingRatingUpdate() {
+        return BindingBuilder.bind(queueStatus()).to(exchangeRatingUpdate()).with(routingUpdateKey);
     }
 
     @Bean
     public MessageConverter jackson2MessageConverter() {
         return new Jackson2JsonMessageConverter();
     }
+//
+//    @Bean(name = "ratingStatusListener")
+//    public SimpleMessageListenerContainer ratingStatusListener(ConnectionFactory connectionFactory) {
+//        SimpleMessageListenerContainer listenerContainer = new SimpleMessageListenerContainer(connectionFactory);
+//        listenerContainer.setQueues(queueStatus());
+//        return listenerContainer;
+//    }
+//    @Bean(name = "ratingStatusListener")
+//    public SimpleMessageListenerContainer ratingUpdateListener(ConnectionFactory connectionFactory) {
+//        SimpleMessageListenerContainer listenerContainer = new SimpleMessageListenerContainer(connectionFactory);
+//        listenerContainer.setQueues(queueUpdate());
+//        return listenerContainer;
+//    }
+
 }
