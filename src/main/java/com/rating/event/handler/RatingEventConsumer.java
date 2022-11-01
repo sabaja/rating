@@ -5,6 +5,9 @@ import com.rating.event.RatingEventMessage;
 import com.rating.model.RatingDto;
 import com.rating.repositories.RatingRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.annotation.Exchange;
+import org.springframework.amqp.rabbit.annotation.Queue;
+import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +21,11 @@ public class RatingEventConsumer {
     @Autowired
     private RatingRepository ratingRepository;
 
-    @RabbitListener(queues = "rating_status_queue", concurrency = "10")
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(value = "rating_status_queue", durable = "true"),
+            exchange = @Exchange(value = "auto.exch", ignoreDeclarationExceptions = "true"),
+            key = "rating_status_routing_key")
+    )
     public RatingEventMessage receiveStatusRatingInformation(RatingDto ratingDto) {
         log.info("Server received a request of Rating information: {}", ratingDto);
         final Long courseId = ratingDto.getCourseId();
@@ -34,7 +41,11 @@ public class RatingEventConsumer {
     }
 
 
-    @RabbitListener(queues = "rating_update_queue", concurrency = "10")
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(value = "rating_update_queue", durable = "true"),
+            exchange = @Exchange(value = "auto.exch", ignoreDeclarationExceptions = "true"),
+            key = "rating_update_routing_key")
+    )
     public RatingEventMessage receiveUptadeRatingInformation(RatingDto ratingDto) {
         log.info("Server received a request of updating Rating information: {}", ratingDto);
         final Long courseId = ratingDto.getCourseId();
